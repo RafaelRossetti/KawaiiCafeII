@@ -1,0 +1,39 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #fce4ec;
+    /* Rosa bebê */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
+}
+
+#game-container {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    overflow: hidden;
+    border: 8px solid #fff;
+}
+
+.kawaii-text {
+    color: #8d6e63;
+    /* Marrom café */
+    text-shadow: 2px 2px 0px #fff;
+}
+
+.screen {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+#loading-screen p {
+    color: #ad8762;
+    font-weight: bold;
+}
