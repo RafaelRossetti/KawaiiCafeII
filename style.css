@@ -36,4 +36,41 @@ body {
 #loading-screen p {
     color: #ad8762;
     font-weight: bold;
+    margin-top: 20px;
+}
+
+.main-title {
+    font-size: 4rem;
+    margin-bottom: 30px;
+}
+
+#start-button-container {
+    margin: 20px 0;
+}
+
+#start-btn {
+    background-color: #fc8eac;
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    font-size: 24px;
+    font-family: 'Outfit', sans-serif;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 6px 0 #d81b60;
+    transition: all 0.1s;
+    display: none;
+    /* Escondido até carregar */
+}
+
+#start-btn:hover {
+    background-color: #ff4081;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 0 #d81b60;
+}
+
+#start-btn:active {
+    transform: translateY(4px);
+    box-shadow: 0 2px 0 #d81b60;
 }

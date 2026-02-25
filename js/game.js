@@ -80,8 +80,18 @@ function create() {
         });
     });
 
-    // Esconder Loading
-    document.getElementById('loading-screen').style.display = 'none';
+    // Gerenciamento do Botão de Início
+    const startBtn = document.getElementById('start-btn');
+    const loadingText = document.getElementById('loading-text');
+
+    // Mostra o botão e esconde o texto de carregamento
+    loadingText.style.display = 'none';
+    startBtn.style.display = 'inline-block';
+
+    startBtn.onclick = () => {
+        document.getElementById('loading-screen').style.display = 'none';
+        // Aqui você pode adicionar um som de clique ou início se desejar
+    };
 }
 
 function update() {
