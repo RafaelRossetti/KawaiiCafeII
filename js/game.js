@@ -22,9 +22,10 @@ function create() {
     this.add.rectangle(600, 300, 600, 600, 0xffebf0);
     this.add.grid(600, 300, 500, 500, 50, 50, 0xffffff, 0.1);
 
-    // Painel Match-3
-    this.add.rectangle(150, 300, 300, 600, 0xd7ccc8);
+    // Painel Match-3 (Cor alterada para roxo conforme pedido)
+    this.add.rectangle(150, 300, 300, 600, 0x9575cd);
     this.match3 = new Match3(this, 10, 150, 6, 6, 45);
+    this.match3.canMove = false; // Bloqueado até iniciar
 
     // Personagem (Mocha)
     this.player = new BearPlayer(this, 600, 400, 'mocha');
@@ -43,6 +44,14 @@ function create() {
         fontSize: '24px',
         color: '#fff',
         backgroundColor: '#fc8eac',
+        padding: { x: 10, y: 5 }
+    });
+
+    // UI - Vidas
+    this.livesText = this.add.text(170, 20, 'Vidas: 🐾🐾🐾', {
+        fontSize: '24px',
+        color: '#fff',
+        backgroundColor: '#9575cd',
         padding: { x: 10, y: 5 }
     });
 
@@ -71,6 +80,7 @@ function create() {
     this.add.text(600, 500, 'ENTREGAR', { color: '#fff' }).setOrigin(0.5);
 
     counter.on('pointerdown', () => {
+        if (!this.match3.canMove) return; // Só entrega se o jogo estiver ativo
         this.player.moveTo(600, 480);
         this.time.delayedCall(500, () => {
             if (this.kitchen.tryCompleteOrder()) {
@@ -78,6 +88,12 @@ function create() {
                 this.cameras.main.shake(100, 0.005);
             }
         });
+    });
+
+    // Evento de Falha no Pedido
+    this.events.on('order-failed', () => {
+        this.cameras.main.flash(300, 255, 0, 0, 0.5);
+        this.updateLivesUI();
     });
 
     // Gerenciamento do Botão de Início
@@ -92,6 +108,8 @@ function create() {
 
         startBtn.onclick = () => {
             document.getElementById('loading-screen').style.display = 'none';
+            this.match3.canMove = true;
+            this.kitchen.spawnOrder();
             console.log("Jogo iniciado pelo usuário!");
         };
     } else {
@@ -99,7 +117,11 @@ function create() {
         console.warn("Elementos do botão de início não encontrados. Verifique se o index.html foi atualizado.");
         setTimeout(() => {
             const screen = document.getElementById('loading-screen');
-            if (screen) screen.style.display = 'none';
+            if (screen) {
+                screen.style.display = 'none';
+                this.match3.canMove = true;
+                this.kitchen.spawnOrder();
+            }
         }, 3000);
     }
 }
@@ -118,4 +140,11 @@ Phaser.Scene.prototype.updateOrderUI = function (order) {
         ingredientsText += `${ing} (${order.ingredients[ing]}) `;
     }
     this.ingredientsNeededText.setText(`Precisa: ${ingredientsText}`);
+};
+Phaser.Scene.prototype.updateLivesUI = function () {
+    let hearts = "";
+    for (let i = 0; i < 3; i++) {
+        hearts += (i < this.kitchen.lives) ? "🐾" : "🖤";
+    }
+    this.livesText.setText(`Vidas: ${hearts}`);
 };

@@ -15,7 +15,7 @@ class Match3 {
             milk: 0xffffff,
             strawberry: 0xff4081,
             tea: 0x4caf50,
-            sugar: 0xe0e0e0
+            sugar: 0xd1c4e9 // Roxo claro (antigo 0xe0e0e0)
         };
 
         this.init();
@@ -162,6 +162,23 @@ class Match3 {
                 }
             }
             if (count >= 3) for (let i = 1; i <= count; i++) matches.push(this.grid[this.rows - i][c]);
+        }
+
+        // Check 2x2 squares
+        for (let r = 0; r < this.rows - 1; r++) {
+            for (let c = 0; c < this.cols - 1; c++) {
+                let type = this.grid[r][c].getData('type');
+                if (type &&
+                    this.grid[r][c + 1].getData('type') === type &&
+                    this.grid[r + 1][c].getData('type') === type &&
+                    this.grid[r + 1][c + 1].getData('type') === type) {
+
+                    matches.push(this.grid[r][c]);
+                    matches.push(this.grid[r][c + 1]);
+                    matches.push(this.grid[r + 1][c]);
+                    matches.push(this.grid[r + 1][c + 1]);
+                }
+            }
         }
 
         if (matches.length > 0) {

@@ -10,8 +10,10 @@ class Kitchen {
         };
         this.currentOrder = null;
         this.score = 0;
+        this.lives = 3;
+        this.orderTimer = null;
         this.setupEventListeners();
-        this.spawnOrder();
+        // spawnOrder será chamado quando o jogo iniciar oficialmente
     }
 
     setupEventListeners() {
@@ -42,6 +44,56 @@ class Kitchen {
 
         this.currentOrder = Phaser.Utils.Array.GetRandom(recipes);
         this.scene.updateOrderUI(this.currentOrder);
+
+        // Iniciar timer de 15 segundos
+        if (this.orderTimer) this.orderTimer.remove();
+        this.orderTimer = this.scene.time.delayedCall(15000, () => {
+            this.failOrder();
+        });
+    }
+
+    failOrder() {
+        if (!this.currentOrder) return;
+
+        this.lives--;
+        this.scene.events.emit('order-failed');
+
+        // Efeito visual no balão de pedido
+        if (this.scene.orderBubble) {
+            let bg = this.scene.orderBubble.list[0];
+            bg.setFillStyle(0xffcdd2); // Rosa/Vermelho claro
+            bg.setStrokeStyle(6, 0xff0000); // Borda vermelha forte
+
+            this.scene.tweens.add({
+                targets: this.scene.orderBubble,
+                x: '+=10',
+                duration: 50,
+                yoyo: true,
+                repeat: 5,
+                onComplete: () => {
+                    this.scene.tweens.add({
+                        targets: this.scene.orderBubble,
+                        alpha: 0,
+                        scale: 0.5,
+                        duration: 300,
+                        onComplete: () => {
+                            bg.setFillStyle(0xffffff); // Reset
+                            bg.setStrokeStyle(4, 0xfc8eac); // Reset
+                            this.scene.orderBubble.alpha = 1;
+                            this.scene.orderBubble.scale = 1;
+                            this.spawnOrder();
+                        }
+                    });
+                }
+            });
+        } else {
+            this.spawnOrder();
+        }
+
+        if (this.lives <= 0) {
+            alert("Game Over! Suas vidas acabaram.");
+            location.reload();
+        }
     }
 
     tryCompleteOrder() {
@@ -58,6 +110,10 @@ class Kitchen {
                 this.inventory[ing] -= this.currentOrder.ingredients[ing];
             }
             this.score += 100;
+            if (this.orderTimer) {
+                this.orderTimer.remove();
+                this.orderTimer = null;
+            }
             this.updateInventoryUI();
             this.scene.events.emit('order-complete');
             this.spawnOrder();
