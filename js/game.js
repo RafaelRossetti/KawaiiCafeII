@@ -14,7 +14,7 @@ const config = {
 const game = new Phaser.Game(config);
 
 function preload() {
-    // Assets serão carregados aqui
+    this.load.audio('bgMusic', 'Music.wav');
 }
 
 function create() {
@@ -123,6 +123,13 @@ function create() {
             document.getElementById('loading-screen').style.display = 'none';
             this.match3.canMove = true;
             this.kitchen.spawnOrder();
+
+            // Iniciar Música de Fundo
+            if (!this.musicStarted) {
+                this.sound.play('bgMusic', { loop: true, volume: 0.5 });
+                this.musicStarted = true;
+            }
+
             console.log("Jogo iniciado pelo usuário!");
         };
     } else {
