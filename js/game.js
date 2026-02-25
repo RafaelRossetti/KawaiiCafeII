@@ -40,28 +40,26 @@ function create() {
     });
 
     // UI - Score
-    this.scoreText = this.add.text(20, 20, 'Score: 0', {
-        fontSize: '24px',
+    this.scoreText = this.add.text(15, 20, 'Score: 0', {
+        fontSize: '20px',
         color: '#fff',
         backgroundColor: '#fc8eac',
-        padding: { x: 10, y: 5 }
+        padding: { x: 8, y: 4 },
+        fontFamily: 'Outfit'
     });
 
-    // UI - Vidas (Rótulo)
+    // UI - Vidas (Removido fundo roxo para não invadir a parte clara)
     this.add.text(170, 15, 'VIDAS', {
-        fontSize: '18px',
+        fontSize: '16px',
         color: '#fff',
-        backgroundColor: '#9575cd',
-        padding: { x: 45, y: 2 },
+        fontFamily: 'Outfit',
         fontWeight: 'bold'
     });
 
-    // UI - Vidas (Ícones abaixo do rótulo)
-    this.livesText = this.add.text(170, 40, '🐾🐾🐾', {
+    this.livesText = this.add.text(170, 35, '🐾🐾🐾', {
         fontSize: '24px',
         color: '#fff',
-        backgroundColor: '#9575cd',
-        padding: { x: 26, y: 5 }
+        fontFamily: 'Outfit'
     });
 
     // UI - Pedido
@@ -79,6 +77,12 @@ function create() {
         fontFamily: 'Outfit'
     }).setOrigin(0.5);
     this.orderBubble.add([bubbleBg, this.orderText, this.ingredientsNeededText]);
+
+    // UI - Barra de Tempo (Feedback Visual)
+    this.timerBg = this.add.rectangle(600, 220, 300, 12, 0xeeeeee).setStrokeStyle(2, 0xfc8eac);
+    this.timerBar = this.add.rectangle(450, 220, 300, 12, 0xfc8eac).setOrigin(0, 0.5);
+    this.timerBar.setVisible(false);
+    this.timerBg.setVisible(false);
 
     // Inicializar Cozinha (Movido para cá para garantir que a UI exista)
     this.kitchen = new Kitchen(this);
@@ -138,6 +142,24 @@ function create() {
 function update() {
     if (this.player) {
         this.player.update();
+    }
+
+    // Atualizar Barra de Tempo
+    if (this.kitchen && this.kitchen.orderTimer) {
+        this.timerBar.setVisible(true);
+        this.timerBg.setVisible(true);
+        let progress = this.kitchen.orderTimer.getProgress();
+        this.timerBar.width = 300 * (1 - progress);
+
+        // Mudar cor se estiver acabando (menos de 3s)
+        if (progress > 0.8) {
+            this.timerBar.setFillStyle(0xff0000);
+        } else {
+            this.timerBar.setFillStyle(0xfc8eac);
+        }
+    } else {
+        this.timerBar.setVisible(false);
+        this.timerBg.setVisible(false);
     }
 }
 
