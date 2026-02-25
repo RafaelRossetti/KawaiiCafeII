@@ -81,17 +81,27 @@ function create() {
     });
 
     // Gerenciamento do Botão de Início
+    console.log("Phaser create() iniciado com sucesso!");
     const startBtn = document.getElementById('start-btn');
     const loadingText = document.getElementById('loading-text');
 
-    // Mostra o botão e esconde o texto de carregamento
-    loadingText.style.display = 'none';
-    startBtn.style.display = 'inline-block';
+    if (startBtn && loadingText) {
+        // Versão Nova do HTML detectada
+        loadingText.style.display = 'none';
+        startBtn.style.display = 'inline-block';
 
-    startBtn.onclick = () => {
-        document.getElementById('loading-screen').style.display = 'none';
-        // Aqui você pode adicionar um som de clique ou início se desejar
-    };
+        startBtn.onclick = () => {
+            document.getElementById('loading-screen').style.display = 'none';
+            console.log("Jogo iniciado pelo usuário!");
+        };
+    } else {
+        // Fallback: se o HTML antigo ainda estiver carregado, inicia o jogo em 3 segundos sozinho
+        console.warn("Elementos do botão de início não encontrados. Verifique se o index.html foi atualizado.");
+        setTimeout(() => {
+            const screen = document.getElementById('loading-screen');
+            if (screen) screen.style.display = 'none';
+        }, 3000);
+    }
 }
 
 function update() {
