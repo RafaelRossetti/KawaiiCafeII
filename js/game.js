@@ -29,8 +29,22 @@ function create() {
     // Personagem (Mocha)
     this.player = new BearPlayer(this, 600, 400, 'mocha');
 
-    // Inicializar Cozinha
-    this.kitchen = new Kitchen(this);
+    // UI - Inventário Rodapé
+    this.inventoryText = this.add.text(320, 560, '', {
+        fontSize: '18px',
+        color: '#6f4e37',
+        fontFamily: 'Outfit',
+        backgroundColor: '#fff',
+        padding: { x: 10, y: 5 }
+    });
+
+    // UI - Score
+    this.scoreText = this.add.text(20, 20, 'Score: 0', {
+        fontSize: '24px',
+        color: '#fff',
+        backgroundColor: '#fc8eac',
+        padding: { x: 10, y: 5 }
+    });
 
     // UI - Pedido
     this.orderBubble = this.add.container(600, 150);
@@ -48,23 +62,9 @@ function create() {
     }).setOrigin(0.5);
     this.orderBubble.add([bubbleBg, this.orderText, this.ingredientsNeededText]);
 
-    // UI - Inventário Rodapé
-    this.inventoryText = this.add.text(320, 560, '', {
-        fontSize: '18px',
-        color: '#6f4e37',
-        fontFamily: 'Outfit',
-        backgroundColor: '#fff',
-        padding: { x: 10, y: 5 }
-    });
+    // Inicializar Cozinha (Movido para cá para garantir que a UI exista)
+    this.kitchen = new Kitchen(this);
     this.kitchen.updateInventoryUI();
-
-    // UI - Score
-    this.scoreText = this.add.text(20, 20, 'Score: 0', {
-        fontSize: '24px',
-        color: '#fff',
-        backgroundColor: '#fc8eac',
-        padding: { x: 10, y: 5 }
-    });
 
     // Bancada de Entrega
     let counter = this.add.rectangle(600, 500, 200, 60, 0x8d6e63).setInteractive();
