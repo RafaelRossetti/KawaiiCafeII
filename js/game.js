@@ -47,12 +47,21 @@ function create() {
         padding: { x: 10, y: 5 }
     });
 
-    // UI - Vidas
-    this.livesText = this.add.text(170, 20, 'Vidas: 🐾🐾🐾', {
+    // UI - Vidas (Rótulo)
+    this.add.text(170, 15, 'VIDAS', {
+        fontSize: '18px',
+        color: '#fff',
+        backgroundColor: '#9575cd',
+        padding: { x: 45, y: 2 },
+        fontWeight: 'bold'
+    });
+
+    // UI - Vidas (Ícones abaixo do rótulo)
+    this.livesText = this.add.text(170, 40, '🐾🐾🐾', {
         fontSize: '24px',
         color: '#fff',
         backgroundColor: '#9575cd',
-        padding: { x: 10, y: 5 }
+        padding: { x: 26, y: 5 }
     });
 
     // UI - Pedido
@@ -146,5 +155,5 @@ Phaser.Scene.prototype.updateLivesUI = function () {
     for (let i = 0; i < 3; i++) {
         hearts += (i < this.kitchen.lives) ? "🐾" : "🖤";
     }
-    this.livesText.setText(`Vidas: ${hearts}`);
+    this.livesText.setText(hearts);
 };
