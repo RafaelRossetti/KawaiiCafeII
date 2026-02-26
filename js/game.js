@@ -24,6 +24,20 @@ function preload() {
     this.load.image('icon_tea', 'cha.png');
     this.load.image('icon_sugar', 'acucar.png');
     this.load.image('puzzleFull', 'Puzzle.png');
+
+    // Listener de Progresso de Carregamento
+    const loadingText = document.getElementById('loading-text');
+    this.load.on('progress', (value) => {
+        if (loadingText) {
+            loadingText.innerText = `Preparando os ingredientes... ${Math.round(value * 100)}%`;
+        }
+    });
+
+    this.load.on('complete', () => {
+        if (loadingText) {
+            loadingText.innerText = 'Pronto! Vamos cozinhar? 🐾';
+        }
+    });
 }
 
 function create() {
@@ -31,8 +45,10 @@ function create() {
     this.add.rectangle(600, 300, 600, 600, 0xffebf0);
     this.add.grid(600, 300, 500, 500, 50, 50, 0xffffff, 0.1);
 
-    // Painel Match-3
+    // Painel Match-3 com visual refinado
     this.add.rectangle(150, 300, 300, 600, 0x9575cd);
+    this.add.rectangle(150, 300, 280, 580, 0x7e57c2, 0.3).setStrokeStyle(4, 0xffffff, 0.5);
+
     this.match3 = new Match3(this, 10, 150, 6, 6, 45);
     this.match3.canMove = false;
 
@@ -64,6 +80,14 @@ function create() {
         { key: 'sugar', icon: 'icon_sugar' }
     ];
 
+    // Fundo para o Inventário
+    let invBg = this.add.graphics();
+    invBg.fillStyle(0xffffff, 0.5);
+    invBg.fillRoundedRect(310, 530, 460, 60, 15);
+    invBg.lineStyle(2, 0x8d6e63, 0.3);
+    invBg.strokeRoundedRect(310, 530, 460, 60, 15);
+    invBg.setDepth(15);
+
     items.forEach((item, index) => {
         let x = 360 + (index * 90);
         let y = 560;
@@ -80,6 +104,9 @@ function create() {
             fontSize: '18px', color: textColor, fontFamily: 'Outfit', fontWeight: 'bold'
         }).setOrigin(0.5).setDepth(21);
     });
+
+    // Adicionar um ícone de estrela ao Score
+    this.add.text(15, 20, '⭐', { fontSize: '24px' }).setDepth(31).setOrigin(0, 0.5).setX(5);
 
     this.hurryUpPlayed = false;
 
@@ -184,6 +211,10 @@ function create() {
         this.sound.play('collect', { volume: 0.6 });
     });
 
+    this.events.on('order-complete', () => {
+        this.hurryUpPlayed = false; // Resetar para o próximo pedido
+    });
+
     this.startGame = () => {
         this.match3.canMove = true;
         this.kitchen.spawnOrder();
@@ -202,6 +233,7 @@ function create() {
 
     const startBtn = document.getElementById('start-btn');
     if (startBtn) {
+        startBtn.style.display = 'block'; // Mostrar o botão quando o Phaser estiver pronto
         startBtn.onclick = () => {
             startBtn.style.display = 'none';
             document.getElementById('loading-screen').style.display = 'none';
