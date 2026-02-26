@@ -38,8 +38,7 @@ function create() {
     // Personagem (Mocha)
     this.player = new BearPlayer(this, 600, 400, 'mocha');
 
-    // UI - Inventário Rodapé com Ícones em Caixas Arredondadas
-    this.inventoryIcons = {};
+    // UI - Inventário Rodapé com Caixas Coloridas
     this.inventoryTexts = {};
     const inventoryColors = {
         coffee: 0x6f4e37,
@@ -58,29 +57,29 @@ function create() {
     ];
 
     items.forEach((item, index) => {
-        let x = 350 + (index * 95);
-        let y = 565;
+        let x = 360 + (index * 90);
+        let y = 560;
 
-        // Criar Caixinha Arredondada
-        let box = this.add.graphics();
-        box.fillStyle(inventoryColors[item.key], 1);
-        box.fillRoundedRect(x - 45, y - 25, 90, 50, 15);
-        box.lineStyle(3, 0xffffff, 1);
-        box.strokeRoundedRect(x - 45, y - 25, 90, 50, 15);
+        // Caixa Arredondada (Fundo colorido igual ao Match-3)
+        let graphics = this.add.graphics();
+        graphics.fillStyle(inventoryColors[item.key], 1);
+        graphics.fillRoundedRect(x - 40, y - 22, 80, 44, 12);
+        graphics.lineStyle(2, 0xffffff, 1);
+        graphics.strokeRoundedRect(x - 40, y - 22, 80, 44, 12);
+        graphics.setDepth(20);
 
-        // Ícone reduzido
-        let icon = this.add.image(x - 20, y, item.icon).setScale(0.18);
+        // Ícone (Reduzido drasticamente para caber na caixa - escala 0.06)
+        let icon = this.add.image(x - 18, y, item.icon).setScale(0.06).setDepth(21);
 
-        // Texto com contraste (marrom para leite, branco para os outros)
+        // Texto da Quantidade (Dentro da caixa)
         let textColor = (item.key === 'milk' || item.key === 'sugar') ? '#6f4e37' : '#ffffff';
         let text = this.add.text(x + 18, y, '0', {
-            fontSize: '22px',
+            fontSize: '18px',
             color: textColor,
             fontFamily: 'Outfit',
             fontWeight: 'bold'
-        }).setOrigin(0.5);
+        }).setOrigin(0.5).setDepth(21);
 
-        this.inventoryIcons[item.key] = icon;
         this.inventoryTexts[item.key] = text;
     });
 
@@ -239,6 +238,7 @@ Phaser.Scene.prototype.updateOrderUI = function (order) {
     }
     this.ingredientsNeededText.setText(`Precisa: ${ingredientsText}`);
 };
+
 Phaser.Scene.prototype.updateLivesUI = function () {
     let hearts = "";
     for (let i = 0; i < 3; i++) {
