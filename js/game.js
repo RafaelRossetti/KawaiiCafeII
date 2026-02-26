@@ -35,7 +35,7 @@ function create() {
     this.match3 = new Match3(this, 10, 150, 6, 6, 45);
     this.match3.canMove = false; // Bloqueado até iniciar
 
-    // Título Principal (Phaser)
+    // Título Principal (Phaser) - Iniciado no centro
     this.gameTitle = this.add.text(600, 300, 'Kawaii Café', {
         fontSize: '64px',
         color: '#8d6e63',
@@ -45,7 +45,7 @@ function create() {
         strokeThickness: 8
     }).setOrigin(0.5).setDepth(100);
 
-    // UI - Inventário Rodapé com Caixas Coloridas
+    // UI - Inventário Rodapé
     this.inventoryTexts = {};
     const inventoryColors = {
         coffee: 0x6f4e37,
@@ -67,7 +67,6 @@ function create() {
         let x = 360 + (index * 90);
         let y = 560;
 
-        // Caixa Arredondada (Fundo colorido igual ao Match-3)
         let graphics = this.add.graphics();
         graphics.fillStyle(inventoryColors[item.key], 1);
         graphics.fillRoundedRect(x - 40, y - 22, 80, 44, 12);
@@ -75,10 +74,8 @@ function create() {
         graphics.strokeRoundedRect(x - 40, y - 22, 80, 44, 12);
         graphics.setDepth(20);
 
-        // Ícone (Reduzido drasticamente para caber na caixa - escala 0.06)
         let icon = this.add.image(x - 18, y, item.icon).setScale(0.06).setDepth(21);
 
-        // Texto da Quantidade (Dentro da caixa)
         let textColor = (item.key === 'milk' || item.key === 'sugar') ? '#6f4e37' : '#ffffff';
         let text = this.add.text(x + 18, y, '0', {
             fontSize: '18px',
@@ -94,50 +91,31 @@ function create() {
 
     // UI - Score
     this.scoreText = this.add.text(15, 20, 'Score: 0', {
-        fontSize: '20px',
-        color: '#fff',
-        backgroundColor: '#fc8eac',
-        padding: { x: 8, y: 4 },
-        fontFamily: 'Outfit'
+        fontSize: '20px', color: '#fff', backgroundColor: '#fc8eac', padding: { x: 8, y: 4 }, fontFamily: 'Outfit'
     });
 
-    // UI - Vidas (Removido fundo roxo para não invadir a parte clara)
-    this.add.text(170, 15, 'VIDAS', {
-        fontSize: '16px',
-        color: '#fff',
-        fontFamily: 'Outfit',
-        fontWeight: 'bold'
-    });
-
-    this.livesText = this.add.text(170, 35, '🐾🐾🐾', {
-        fontSize: '24px',
-        color: '#fff',
-        fontFamily: 'Outfit'
-    });
+    // UI - Vidas
+    this.add.text(170, 15, 'VIDAS', { fontSize: '16px', color: '#fff', fontFamily: 'Outfit', fontWeight: 'bold' });
+    this.livesText = this.add.text(170, 35, '🐾🐾🐾', { fontSize: '24px', color: '#fff', fontFamily: 'Outfit' });
 
     // UI - Pedido
     this.orderBubble = this.add.container(600, 150);
     let bubbleBg = this.add.rectangle(0, 0, 300, 100, 0xffffff, 0.9).setStrokeStyle(4, 0xfc8eac);
     this.orderText = this.add.text(0, -10, 'Aguardando Pedido...', {
-        fontSize: '20px',
-        color: '#8d6e63',
-        fontFamily: 'Outfit',
-        fontWeight: 'bold'
+        fontSize: '20px', color: '#8d6e63', fontFamily: 'Outfit', fontWeight: 'bold'
     }).setOrigin(0.5);
     this.ingredientsNeededText = this.add.text(0, 20, '', {
-        fontSize: '16px',
-        color: '#ad8762',
-        fontFamily: 'Outfit'
+        fontSize: '16px', color: '#ad8762', fontFamily: 'Outfit'
     }).setOrigin(0.5);
     this.orderBubble.add([bubbleBg, this.orderText, this.ingredientsNeededText]);
 
-    // UI - Barra de Tempo (Feedback Visual)
+    // UI - Barra de Tempo
     this.timerBg = this.add.rectangle(600, 220, 300, 12, 0xeeeeee).setStrokeStyle(2, 0xfc8eac);
     this.timerBar = this.add.rectangle(450, 220, 300, 12, 0xfc8eac).setOrigin(0, 0.5);
     this.timerBar.setVisible(false);
     this.timerBg.setVisible(false);
 
-    // Inicializar Cozinha (Movido para cá para garantir que a UI exista)
+    // Inicializar Cozinha
     this.kitchen = new Kitchen(this);
     this.kitchen.updateInventoryUI();
 
@@ -146,15 +124,13 @@ function create() {
     this.add.text(600, 500, 'ENTREGAR', { color: '#fff' }).setOrigin(0.5);
 
     counter.on('pointerdown', () => {
-        if (!this.match3.canMove) return; // Só entrega se o jogo estiver ativo
-        // Movimento do player removido conforme pedido
+        if (!this.match3.canMove) return;
         if (this.kitchen.tryCompleteOrder()) {
             this.scoreText.setText(`Score: ${this.kitchen.score}`);
             this.cameras.main.shake(100, 0.005);
         }
     });
 
-    // Evento de Falha no Pedido
     this.events.on('order-failed', () => {
         this.cameras.main.flash(300, 255, 0, 0, 0.5);
         this.updateLivesUI();
@@ -165,81 +141,59 @@ function create() {
         this.sound.play('collect', { volume: 0.6 });
     });
 
+    // Função para Iniciar Jogo (Shared logic)
+    this.startGame = () => {
+        this.match3.canMove = true;
+        this.kitchen.spawnOrder();
+
+        // Animando o título para cima do pedido (Posição final solicitada)
+        this.tweens.add({
+            targets: this.gameTitle,
+            y: 60,
+            scale: 0.7,
+            duration: 800,
+            ease: 'Power2'
+        });
+
+        if (!this.musicStarted) {
+            this.sound.play('bgMusic', { loop: true, volume: 0.5 });
+            this.musicStarted = true;
+        }
+    };
+
     // Gerenciamento do Botão de Início
-    console.log("Phaser create() iniciado com sucesso!");
     const startBtn = document.getElementById('start-btn');
-    const loadingText = document.getElementById('loading-text');
-
-    if (startBtn && loadingText) {
-        // Versão Nova do HTML detectada
-        loadingText.style.display = 'none';
+    if (startBtn) {
         startBtn.style.display = 'inline-block';
-
         startBtn.onclick = () => {
-            startBtn.style.display = 'none'; // Esconde apenas o botão
-            document.getElementById('loading-screen').style.pointerEvents = 'none';
-
-            // Animando o título para cima do pedido
-            this.tweens.add({
-                targets: this.gameTitle,
-                y: 60,
-                scale: 0.7,
-                duration: 800,
-                ease: 'Power2'
-            });
-
-            this.match3.canMove = true;
-            this.kitchen.spawnOrder();
-
-            // Iniciar Música de Fundo
-            if (!this.musicStarted) {
-                this.sound.play('bgMusic', { loop: true, volume: 0.5 });
-                this.musicStarted = true;
-            }
-
-            console.log("Jogo iniciado pelo usuário!");
+            startBtn.style.display = 'none';
+            document.getElementById('loading-screen').style.display = 'none';
+            this.startGame();
         };
     } else {
-        // Fallback: se o HTML antigo ainda estiver carregado, inicia o jogo em 3 segundos sozinho
-        console.warn("Elementos do botão de início não encontrados. Verifique se o index.html foi atualizado.");
+        // Fallback robusto
         setTimeout(() => {
             const screen = document.getElementById('loading-screen');
-            if (screen) {
-                screen.style.display = 'none';
-                this.match3.canMove = true;
-                this.kitchen.spawnOrder();
-            }
-        }, 3000);
+            if (screen) screen.style.display = 'none';
+            this.startGame();
+        }, 2000);
     }
 }
 
 function update() {
-    // Player removido
-
-    // Atualizar Barra de Tempo
     if (this.kitchen && this.kitchen.orderTimer) {
         this.timerBar.setVisible(true);
         this.timerBg.setVisible(true);
         let progress = this.kitchen.orderTimer.getProgress();
         this.timerBar.width = 300 * (1 - progress);
-
         let remainingTime = this.kitchen.baseOrderTime * (1 - progress);
-
-        // Feedback de Urgência dinâmico (Sons e Cores)
-        // Avisa quando faltar 5 segundos ou 30% do tempo (o que for menor)
         let hurryThreshold = Math.min(5000, this.kitchen.baseOrderTime * 0.3);
-
         if (remainingTime <= hurryThreshold && !this.hurryUpPlayed) {
             this.sound.play('hurryUp', { volume: 0.7 });
             this.hurryUpPlayed = true;
         }
-
-        // Mudar cor se estiver acabando (menos de 3s)
-        if (progress > 0.8) {
-            this.timerBar.setFillStyle(0xff0000);
-        } else {
-            this.timerBar.setFillStyle(0xfc8eac);
-        }
+        if (progress > 0.8) this.timerBar.setFillStyle(0xff0000);
+        else this.timerBar.setFillStyle(0xfc8eac);
     } else {
         this.timerBar.setVisible(false);
         this.timerBg.setVisible(false);

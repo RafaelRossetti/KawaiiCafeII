@@ -138,40 +138,4 @@ class Kitchen {
     }
 }
 
-class BearPlayer extends Phaser.GameObjects.Container {
-    constructor(scene, x, y, type) {
-        super(scene, x, y);
-        this.scene = scene;
-        this.type = type; // 'milk' ou 'mocha'
 
-        let color = (type === 'milk') ? 0xffffff : 0x8d6e63;
-        let body = scene.add.circle(0, 0, 30, color);
-        let earsL = scene.add.circle(-20, -25, 12, color);
-        let earsR = scene.add.circle(20, -25, 12, color);
-        let face = scene.add.circle(0, 5, 20, 0xf5f5f5);
-        let nose = scene.add.circle(0, 5, 5, 0x333333);
-        let eyeL = scene.add.circle(-10, -5, 4, 0x333333);
-        let eyeR = scene.add.circle(10, -5, 4, 0x333333);
-
-        this.add([earsL, earsR, body, face, eyeL, eyeR, nose]);
-        scene.add.existing(this);
-
-        this.moveSpeed = 4;
-        this.targetX = x;
-        this.targetY = y;
-    }
-
-    update() {
-        // Movimentação simples para o target
-        let dx = this.targetX - this.x;
-        let dy = this.targetY - this.y;
-
-        if (Math.abs(dx) > 5) this.x += Math.sign(dx) * this.moveSpeed;
-        if (Math.abs(dy) > 5) this.y += Math.sign(dy) * this.moveSpeed;
-    }
-
-    moveTo(x, y) {
-        this.targetX = x;
-        this.targetY = y;
-    }
-}
