@@ -136,12 +136,12 @@ function create() {
     this.timerBg.setVisible(false);
 
     // SISTEMA DE PUZZLE
-    this.puzzleCost = 200;
+    this.puzzleCost = 10;
     this.puzzlePieces = [];
     const puzzleX = 600;
-    const puzzleY = 345;
-    const imgWidth = 380;
-    const imgHeight = 240;
+    const puzzleY = 320;
+    const imgWidth = 500;
+    const imgHeight = 315;
     const cols = 4;
     const rows = 3;
     const pieceW = imgWidth / cols;
@@ -150,7 +150,7 @@ function create() {
     // Moldura do Puzzle (Fundo escuro para as linhas divisórias aparecerem)
     this.add.rectangle(puzzleX, puzzleY, imgWidth + 6, imgHeight + 6, 0x2c1810, 1).setStrokeStyle(3, 0x8d6e63);
 
-    this.puzzleCostText = this.add.text(600, 485, `Próxima peça: ${this.puzzleCost} pts`, {
+    this.puzzleCostText = this.add.text(600, 490, `Próxima peça: ${this.puzzleCost} pts`, {
         fontSize: '16px', color: '#8d6e63', fontFamily: 'Outfit', fontWeight: 'bold',
         backgroundColor: '#ffffffaa', padding: { x: 10, y: 5 }
     }).setOrigin(0.5).setDepth(30);
@@ -167,11 +167,11 @@ function create() {
             let sh = piece.height / rows;
             piece.setCrop(c * sw, r * sh, sw, sh);
 
-            // Define o tamanho da PEÇA individual (com margem de 2px para a linha)
+            // Define o tamanho da PEÇA individual para preencher o espaço (levemente menor para a linha divisória)
             piece.setDisplaySize(pieceW - 2, pieceH - 2);
 
             piece.setInteractive();
-            piece.setTint(0x888888); // Tom de cinza (desaturado)
+            piece.setTint(0xbbbbbb); // Cinza claro (desaturado, não escuro)
             piece.setData('unlocked', false);
 
             piece.on('pointerdown', () => {

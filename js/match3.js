@@ -40,8 +40,8 @@ class Match3 {
         let bg = this.scene.add.rectangle(0, 0, this.size - 4, this.size - 4, this.colors[type], 1).setInteractive();
         bg.setStrokeStyle(2, 0xffffff);
 
-        // Usar o ícone correspondente ao invés de um círculo
-        let icon = this.scene.add.image(0, 0, `icon_${type}`).setScale(0.035);
+        // Simbolo simples (círculo para ficar fofo) como era antes
+        let icon = this.scene.add.circle(0, 0, this.size / 4, 0x000000, 0.2);
 
         container.add([bg, icon]);
         container.setData('row', r);
