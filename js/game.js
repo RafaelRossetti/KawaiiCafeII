@@ -141,37 +141,40 @@ function create() {
     const puzzleX = 600;
     const puzzleY = 320;
     const imgWidth = 500;
-    const imgHeight = 315;
-    const cols = 4;
-    const rows = 3;
+    const imgHeight = 280; // Ajustado para 6x2
+    const cols = 6;
+    const rows = 2;
     const pieceW = imgWidth / cols;
     const pieceH = imgHeight / rows;
 
-    // Moldura do Puzzle (Fundo escuro para as linhas divisórias aparecerem)
-    this.add.rectangle(puzzleX, puzzleY, imgWidth + 6, imgHeight + 6, 0x2c1810, 1).setStrokeStyle(3, 0x8d6e63);
+    // Fundo do Puzzle (Rosa bem claro para combinar com a imagem 1)
+    this.add.rectangle(puzzleX, puzzleY, imgWidth + 4, imgHeight + 4, 0xfff0f5, 1).setStrokeStyle(2, 0x8d6e63);
 
     this.puzzleCostText = this.add.text(600, 490, `Próxima peça: ${this.puzzleCost} pts`, {
         fontSize: '16px', color: '#8d6e63', fontFamily: 'Outfit', fontWeight: 'bold',
         backgroundColor: '#ffffffaa', padding: { x: 10, y: 5 }
     }).setOrigin(0.5).setDepth(30);
 
+    // Loop para criar as peças
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            let px = (puzzleX - imgWidth / 2) + (c * pieceW) + pieceW / 2;
-            let py = (puzzleY - imgHeight / 2) + (r * pieceH) + pieceH / 2;
+            let px = (puzzleX - imgWidth / 2) + (c * pieceW);
+            let py = (puzzleY - imgHeight / 2) + (r * pieceH);
 
-            let piece = this.add.sprite(px, py, 'puzzleFull');
+            // Criamos a peça com origem 0,0 para facilitar o encaixe das coordenadas de crop
+            let piece = this.add.sprite(px, py, 'puzzleFull').setOrigin(0, 0);
 
-            // Define o recorte (crop) com base na textura original
-            let sw = piece.width / cols;
-            let sh = piece.height / rows;
+            // IMPORTANTE: Para o crop funcionar com o tamanho da célula, o sprite deve ser escalado
+            // para o tamanho total da imagem primeiro.
+            piece.setDisplaySize(imgWidth, imgHeight);
+
+            // O crop é baseado nas coordenadas reais da textura (width/height originais)
+            let sw = piece.texture.getSourceImage().width / cols;
+            let sh = piece.texture.getSourceImage().height / rows;
             piece.setCrop(c * sw, r * sh, sw, sh);
 
-            // Define o tamanho da PEÇA individual para preencher o espaço (levemente menor para a linha divisória)
-            piece.setDisplaySize(pieceW - 2, pieceH - 2);
-
             piece.setInteractive();
-            piece.setTint(0xbbbbbb); // Cinza claro (desaturado, não escuro)
+            piece.setTint(0xcccccc); // Tom de cinza claro/desaturado
             piece.setData('unlocked', false);
 
             piece.on('pointerdown', () => {
@@ -190,6 +193,21 @@ function create() {
             });
             this.puzzlePieces.push(piece);
         }
+    }
+
+    // Desenhar as linhas divisórias por cima (como na Imagem 1)
+    let puzzleGrid = this.add.graphics().setDepth(10);
+    puzzleGrid.lineStyle(1, 0x2c3e50, 0.5); // Linha fina escura semi-transparente
+
+    // Linhas Verticais
+    for (let c = 1; c < cols; c++) {
+        let lx = (puzzleX - imgWidth / 2) + (c * pieceW);
+        puzzleGrid.lineBetween(lx, puzzleY - imgHeight / 2, lx, puzzleY + imgHeight / 2);
+    }
+    // Linha Horizontal
+    for (let r = 1; r < rows; r++) {
+        let ly = (puzzleY - imgHeight / 2) + (r * pieceH);
+        puzzleGrid.lineBetween(puzzleX - imgWidth / 2, ly, puzzleX + imgWidth / 2, ly);
     }
 
     // Inicializar Cozinha
