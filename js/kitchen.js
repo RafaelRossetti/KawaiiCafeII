@@ -118,11 +118,11 @@ class Kitchen {
                 this.orderTimer = null;
             }
 
-            // Progressão de dificuldade
+            // Progressão de dificuldade (Acelerada: a cada 2 entregas)
             this.completedOrdersCount++;
-            if (this.completedOrdersCount % 5 === 0) {
-                // Diminuir 1 segundo (mínimo de 5 segundos para não ficar impossível)
-                this.baseOrderTime = Math.max(5000, this.baseOrderTime - 1000);
+            if (this.completedOrdersCount % 2 === 0) {
+                // Diminuir 1 segundo (mínimo de 3 segundos conforme pedido)
+                this.baseOrderTime = Math.max(3000, this.baseOrderTime - 1000);
                 console.log(`Dificuldade aumentada! Novo tempo: ${this.baseOrderTime / 1000}s`);
 
                 // Feedback visual de nível subindo
