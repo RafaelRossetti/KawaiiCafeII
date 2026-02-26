@@ -38,9 +38,17 @@ function create() {
     // Personagem (Mocha)
     this.player = new BearPlayer(this, 600, 400, 'mocha');
 
-    // UI - Inventário Rodapé com Ícones
+    // UI - Inventário Rodapé com Ícones em Caixas Arredondadas
     this.inventoryIcons = {};
     this.inventoryTexts = {};
+    const inventoryColors = {
+        coffee: 0x6f4e37,
+        milk: 0xffffff,
+        strawberry: 0xff4081,
+        tea: 0x4caf50,
+        sugar: 0xd1c4e9
+    };
+
     const items = [
         { key: 'coffee', icon: 'icon_coffee' },
         { key: 'milk', icon: 'icon_milk' },
@@ -50,14 +58,27 @@ function create() {
     ];
 
     items.forEach((item, index) => {
-        let x = 340 + (index * 110);
-        let icon = this.add.image(x, 565, item.icon).setScale(0.4);
-        let text = this.add.text(x + 25, 565, '0', {
-            fontSize: '18px',
-            color: '#6f4e37',
+        let x = 350 + (index * 95);
+        let y = 565;
+
+        // Criar Caixinha Arredondada
+        let box = this.add.graphics();
+        box.fillStyle(inventoryColors[item.key], 1);
+        box.fillRoundedRect(x - 45, y - 25, 90, 50, 15);
+        box.lineStyle(3, 0xffffff, 1);
+        box.strokeRoundedRect(x - 45, y - 25, 90, 50, 15);
+
+        // Ícone reduzido
+        let icon = this.add.image(x - 20, y, item.icon).setScale(0.18);
+
+        // Texto com contraste (marrom para leite, branco para os outros)
+        let textColor = (item.key === 'milk' || item.key === 'sugar') ? '#6f4e37' : '#ffffff';
+        let text = this.add.text(x + 18, y, '0', {
+            fontSize: '22px',
+            color: textColor,
             fontFamily: 'Outfit',
             fontWeight: 'bold'
-        }).setOrigin(0, 0.5);
+        }).setOrigin(0.5);
 
         this.inventoryIcons[item.key] = icon;
         this.inventoryTexts[item.key] = text;
