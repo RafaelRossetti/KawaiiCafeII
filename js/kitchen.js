@@ -24,13 +24,13 @@ class Kitchen {
     }
 
     updateInventoryUI() {
-        // Esta função será chamada para atualizar o rodapé
-        if (this.scene.inventoryText) {
-            let text = `📦 Inv: `;
+        // Atualiza os textos individuais ao lado de cada ícone
+        if (this.scene.inventoryTexts) {
             for (let key in this.inventory) {
-                text += `${key.charAt(0).toUpperCase()}: ${this.inventory[key]} `;
+                if (this.scene.inventoryTexts[key]) {
+                    this.scene.inventoryTexts[key].setText(this.inventory[key]);
+                }
             }
-            this.scene.inventoryText.setText(text);
         }
     }
 
@@ -44,6 +44,7 @@ class Kitchen {
 
         this.currentOrder = Phaser.Utils.Array.GetRandom(recipes);
         this.scene.updateOrderUI(this.currentOrder);
+        this.scene.events.emit('order-spawned');
 
         // Iniciar timer de 15 segundos
         if (this.orderTimer) this.orderTimer.remove();

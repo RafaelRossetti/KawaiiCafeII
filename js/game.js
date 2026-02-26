@@ -15,6 +15,14 @@ const game = new Phaser.Game(config);
 
 function preload() {
     this.load.audio('bgMusic', 'Music.wav');
+    this.load.audio('hurryUp', 'HurryUp.mp3');
+    this.load.audio('collect', 'Collect.wav');
+
+    this.load.image('icon_coffee', 'cafe.png');
+    this.load.image('icon_milk', 'leite.png');
+    this.load.image('icon_strawberry', 'morango.png');
+    this.load.image('icon_tea', 'cha.png');
+    this.load.image('icon_sugar', 'acucar.png');
 }
 
 function create() {
@@ -30,14 +38,32 @@ function create() {
     // Personagem (Mocha)
     this.player = new BearPlayer(this, 600, 400, 'mocha');
 
-    // UI - Inventário Rodapé
-    this.inventoryText = this.add.text(320, 560, '', {
-        fontSize: '18px',
-        color: '#6f4e37',
-        fontFamily: 'Outfit',
-        backgroundColor: '#fff',
-        padding: { x: 10, y: 5 }
+    // UI - Inventário Rodapé com Ícones
+    this.inventoryIcons = {};
+    this.inventoryTexts = {};
+    const items = [
+        { key: 'coffee', icon: 'icon_coffee' },
+        { key: 'milk', icon: 'icon_milk' },
+        { key: 'strawberry', icon: 'icon_strawberry' },
+        { key: 'tea', icon: 'icon_tea' },
+        { key: 'sugar', icon: 'icon_sugar' }
+    ];
+
+    items.forEach((item, index) => {
+        let x = 340 + (index * 110);
+        let icon = this.add.image(x, 565, item.icon).setScale(0.4);
+        let text = this.add.text(x + 25, 565, '0', {
+            fontSize: '18px',
+            color: '#6f4e37',
+            fontFamily: 'Outfit',
+            fontWeight: 'bold'
+        }).setOrigin(0, 0.5);
+
+        this.inventoryIcons[item.key] = icon;
+        this.inventoryTexts[item.key] = text;
     });
+
+    this.hurryUpPlayed = false;
 
     // UI - Score
     this.scoreText = this.add.text(15, 20, 'Score: 0', {
@@ -107,6 +133,11 @@ function create() {
     this.events.on('order-failed', () => {
         this.cameras.main.flash(300, 255, 0, 0, 0.5);
         this.updateLivesUI();
+        this.hurryUpPlayed = false;
+    });
+
+    this.events.on('ingredient-collected', () => {
+        this.sound.play('collect', { volume: 0.6 });
     });
 
     // Gerenciamento do Botão de Início
@@ -157,6 +188,14 @@ function update() {
         this.timerBg.setVisible(true);
         let progress = this.kitchen.orderTimer.getProgress();
         this.timerBar.width = 300 * (1 - progress);
+
+        let remainingTime = 15000 * (1 - progress);
+
+        // Feedback de Urgência (Sons e Cores)
+        if (remainingTime <= 5000 && !this.hurryUpPlayed) {
+            this.sound.play('hurryUp', { volume: 0.7 });
+            this.hurryUpPlayed = true;
+        }
 
         // Mudar cor se estiver acabando (menos de 3s)
         if (progress > 0.8) {
