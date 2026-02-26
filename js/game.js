@@ -35,8 +35,15 @@ function create() {
     this.match3 = new Match3(this, 10, 150, 6, 6, 45);
     this.match3.canMove = false; // Bloqueado até iniciar
 
-    // Personagem (Mocha)
-    this.player = new BearPlayer(this, 600, 400, 'mocha');
+    // Título Principal (Phaser)
+    this.gameTitle = this.add.text(600, 300, 'Kawaii Café', {
+        fontSize: '64px',
+        color: '#8d6e63',
+        fontFamily: 'Outfit',
+        fontWeight: 'bold',
+        stroke: '#ffffff',
+        strokeThickness: 8
+    }).setOrigin(0.5).setDepth(100);
 
     // UI - Inventário Rodapé com Caixas Coloridas
     this.inventoryTexts = {};
@@ -140,13 +147,11 @@ function create() {
 
     counter.on('pointerdown', () => {
         if (!this.match3.canMove) return; // Só entrega se o jogo estiver ativo
-        this.player.moveTo(600, 480);
-        this.time.delayedCall(500, () => {
-            if (this.kitchen.tryCompleteOrder()) {
-                this.scoreText.setText(`Score: ${this.kitchen.score}`);
-                this.cameras.main.shake(100, 0.005);
-            }
-        });
+        // Movimento do player removido conforme pedido
+        if (this.kitchen.tryCompleteOrder()) {
+            this.scoreText.setText(`Score: ${this.kitchen.score}`);
+            this.cameras.main.shake(100, 0.005);
+        }
     });
 
     // Evento de Falha no Pedido
@@ -171,7 +176,18 @@ function create() {
         startBtn.style.display = 'inline-block';
 
         startBtn.onclick = () => {
-            document.getElementById('loading-screen').style.display = 'none';
+            startBtn.style.display = 'none'; // Esconde apenas o botão
+            document.getElementById('loading-screen').style.pointerEvents = 'none';
+
+            // Animando o título para cima do pedido
+            this.tweens.add({
+                targets: this.gameTitle,
+                y: 60,
+                scale: 0.7,
+                duration: 800,
+                ease: 'Power2'
+            });
+
             this.match3.canMove = true;
             this.kitchen.spawnOrder();
 
@@ -198,9 +214,7 @@ function create() {
 }
 
 function update() {
-    if (this.player) {
-        this.player.update();
-    }
+    // Player removido
 
     // Atualizar Barra de Tempo
     if (this.kitchen && this.kitchen.orderTimer) {
