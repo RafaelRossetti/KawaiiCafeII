@@ -147,10 +147,10 @@ function create() {
     const pieceW = imgWidth / cols;
     const pieceH = imgHeight / rows;
 
-    // Moldura do Puzzle
-    this.add.rectangle(puzzleX, puzzleY, imgWidth + 10, imgHeight + 10, 0x8d6e63, 0.2).setStrokeStyle(2, 0x8d6e63);
+    // Moldura do Puzzle (Fundo escuro para as linhas divisórias aparecerem)
+    this.add.rectangle(puzzleX, puzzleY, imgWidth + 6, imgHeight + 6, 0x2c1810, 1).setStrokeStyle(3, 0x8d6e63);
 
-    this.puzzleCostText = this.add.text(600, 475, `Próxima peça: ${this.puzzleCost} pts`, {
+    this.puzzleCostText = this.add.text(600, 485, `Próxima peça: ${this.puzzleCost} pts`, {
         fontSize: '16px', color: '#8d6e63', fontFamily: 'Outfit', fontWeight: 'bold',
         backgroundColor: '#ffffffaa', padding: { x: 10, y: 5 }
     }).setOrigin(0.5).setDepth(30);
@@ -160,11 +160,18 @@ function create() {
             let px = (puzzleX - imgWidth / 2) + (c * pieceW) + pieceW / 2;
             let py = (puzzleY - imgHeight / 2) + (r * pieceH) + pieceH / 2;
 
-            let piece = this.add.sprite(px, py, 'puzzleFull').setDisplaySize(imgWidth, imgHeight);
-            // Crop precisa ser baseado no tamanho original da imagem
-            piece.setCrop(c * (piece.width / cols), r * (piece.height / rows), piece.width / cols, piece.height / rows);
+            let piece = this.add.sprite(px, py, 'puzzleFull');
+
+            // Define o recorte (crop) com base na textura original
+            let sw = piece.width / cols;
+            let sh = piece.height / rows;
+            piece.setCrop(c * sw, r * sh, sw, sh);
+
+            // Define o tamanho da PEÇA individual (com margem de 2px para a linha)
+            piece.setDisplaySize(pieceW - 2, pieceH - 2);
+
             piece.setInteractive();
-            piece.setTint(0x333333); // Tons de cinza
+            piece.setTint(0x888888); // Tom de cinza (desaturado)
             piece.setData('unlocked', false);
 
             piece.on('pointerdown', () => {
@@ -176,7 +183,7 @@ function create() {
                     piece.setData('unlocked', true);
                     this.puzzleCost *= 2;
                     this.puzzleCostText.setText(`Próxima peça: ${this.puzzleCost} pts`);
-                    this.sound.play('collect', { volume: 0.4, detune: 500 }); // Efeito sonoro diferente
+                    this.sound.play('collect', { volume: 0.4, detune: 500 });
                 } else {
                     this.cameras.main.shake(100, 0.002);
                 }
