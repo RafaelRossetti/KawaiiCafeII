@@ -12,6 +12,8 @@ class Kitchen {
         this.score = 0;
         this.lives = 3;
         this.orderTimer = null;
+        this.baseOrderTime = 15000; // 15 segundos iniciais
+        this.completedOrdersCount = 0;
         this.setupEventListeners();
         // spawnOrder será chamado quando o jogo iniciar oficialmente
     }
@@ -46,9 +48,9 @@ class Kitchen {
         this.scene.updateOrderUI(this.currentOrder);
         this.scene.events.emit('order-spawned');
 
-        // Iniciar timer de 15 segundos
+        // Iniciar timer com tempo progressivo
         if (this.orderTimer) this.orderTimer.remove();
-        this.orderTimer = this.scene.time.delayedCall(15000, () => {
+        this.orderTimer = this.scene.time.delayedCall(this.baseOrderTime, () => {
             this.failOrder();
         });
     }
@@ -115,6 +117,18 @@ class Kitchen {
                 this.orderTimer.remove();
                 this.orderTimer = null;
             }
+
+            // Progressão de dificuldade
+            this.completedOrdersCount++;
+            if (this.completedOrdersCount % 5 === 0) {
+                // Diminuir 1 segundo (mínimo de 5 segundos para não ficar impossível)
+                this.baseOrderTime = Math.max(5000, this.baseOrderTime - 1000);
+                console.log(`Dificuldade aumentada! Novo tempo: ${this.baseOrderTime / 1000}s`);
+
+                // Feedback visual de nível subindo
+                this.scene.cameras.main.flash(200, 255, 255, 255, 0.3);
+            }
+
             this.updateInventoryUI();
             this.scene.events.emit('order-complete');
             this.spawnOrder();

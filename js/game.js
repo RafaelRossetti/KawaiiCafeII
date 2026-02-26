@@ -209,10 +209,13 @@ function update() {
         let progress = this.kitchen.orderTimer.getProgress();
         this.timerBar.width = 300 * (1 - progress);
 
-        let remainingTime = 15000 * (1 - progress);
+        let remainingTime = this.kitchen.baseOrderTime * (1 - progress);
 
-        // Feedback de Urgência (Sons e Cores)
-        if (remainingTime <= 5000 && !this.hurryUpPlayed) {
+        // Feedback de Urgência dinâmico (Sons e Cores)
+        // Avisa quando faltar 5 segundos ou 30% do tempo (o que for menor)
+        let hurryThreshold = Math.min(5000, this.kitchen.baseOrderTime * 0.3);
+
+        if (remainingTime <= hurryThreshold && !this.hurryUpPlayed) {
             this.sound.play('hurryUp', { volume: 0.7 });
             this.hurryUpPlayed = true;
         }
