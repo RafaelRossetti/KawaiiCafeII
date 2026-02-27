@@ -105,8 +105,7 @@ function create() {
         }).setOrigin(0.5).setDepth(21);
     });
 
-    // Adicionar um ícone de estrela ao Score
-    this.add.text(15, 20, '⭐', { fontSize: '24px' }).setDepth(31).setOrigin(0, 0.5).setX(5);
+    // Estrela removida (era: this.add.text(15, 20, '⭐', ...))
 
     this.hurryUpPlayed = false;
 
@@ -140,8 +139,8 @@ function create() {
     this.puzzlePieces = [];
     const puzzleX = 600;
     const puzzleY = 320;
-    const imgWidth = 500;
-    const imgHeight = 280;
+    const imgWidth = 425;  // Era 500, reduzido ~15% para não tampar cronômetro
+    const imgHeight = 238;  // Era 280, reduzido ~15%
     const cols = 6;
     const rows = 2;
     const pieceW = imgWidth / cols;
@@ -193,20 +192,32 @@ function create() {
             rt.draw(tmpImg, -srcX * scaleX, -srcY * scaleY);
             tmpImg.destroy();
 
-            rt.setAlpha(0.3); // bloqueada = escurecida
+            // A imagem fica em alpha total mas coberta por um retângulo sólido
+            rt.setAlpha(1);
             rt.setData('unlocked', false);
             rt.setInteractive(new Phaser.Geom.Rectangle(0, 0, cellW, cellH), Phaser.Geom.Rectangle.Contains);
+
+            // Cover sólido na cor do fundo — esconde a imagem enquanto bloqueada
+            const cover = this.add.rectangle(cellX, cellY, cellW, cellH, 0xffe0eb)
+                .setOrigin(0, 0)
+                .setStrokeStyle(1, 0xd4a0b0, 0.5);
 
             rt.on('pointerdown', () => {
                 if (rt.getData('unlocked')) return;
                 if (this.kitchen.score >= this.puzzleCost) {
                     this.kitchen.score -= this.puzzleCost;
                     this.scoreText.setText(`Score: ${this.kitchen.score}`);
-                    rt.setAlpha(1);
+                    cover.destroy(); // Remove o cover → revela a imagem
                     rt.setData('unlocked', true);
                     this.puzzleCost *= 2;
                     this.puzzleCostText.setText(`Próxima peça: ${this.puzzleCost} pts`);
                     this.sound.play('collect', { volume: 0.4, detune: 500 });
+
+                    // Verifica se todas as peças foram desbloqueadas → VITÓRIA!
+                    const allUnlocked = this.puzzlePieces.every(p => p.getData('unlocked'));
+                    if (allUnlocked) {
+                        this.showVictory();
+                    }
                 } else {
                     this.cameras.main.shake(100, 0.002);
                 }
@@ -217,6 +228,41 @@ function create() {
     }
 
     // Sem linhas divisórias — as peças encostam perfeitamente
+
+    // Função de Vitória
+    this.showVictory = () => {
+        // Overlay semi-transparente
+        const overlay = this.add.rectangle(900 / 2, 600 / 2, 900, 600, 0x000000, 0.65).setDepth(200);
+
+        // Painel central
+        const panel = this.add.rectangle(900 / 2, 600 / 2, 520, 260, 0xfff0f5).setDepth(201);
+        panel.setStrokeStyle(4, 0xfc8eac);
+
+        this.add.text(900 / 2, 260, '🎉 Parabéns! 🎉', {
+            fontSize: '36px', color: '#fc8eac', fontFamily: 'Outfit', fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(202);
+
+        this.add.text(900 / 2, 320, 'Você completou o puzzle do Kawaii Café!', {
+            fontSize: '18px', color: '#8d6e63', fontFamily: 'Outfit'
+        }).setOrigin(0.5).setDepth(202);
+
+        this.add.text(900 / 2, 360, `Score Final: ${this.kitchen.score} pts`, {
+            fontSize: '22px', color: '#8d6e63', fontFamily: 'Outfit', fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(202);
+
+        // Botão de reiniciar
+        const restartBtn = this.add.rectangle(900 / 2, 415, 200, 45, 0xfc8eac).setDepth(202).setInteractive();
+        this.add.text(900 / 2, 415, '🐾 Jogar Novamente', {
+            fontSize: '16px', color: '#fff', fontFamily: 'Outfit', fontWeight: 'bold'
+        }).setOrigin(0.5).setDepth(203);
+
+        restartBtn.on('pointerdown', () => {
+            this.scene.restart();
+        });
+
+        // Para o jogo
+        if (this.match3) this.match3.canMove = false;
+    };
 
     // Inicializar Cozinha
     this.kitchen = new Kitchen(this);
