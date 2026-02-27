@@ -141,18 +141,18 @@ function create() {
     const puzzleX = 600;
     const puzzleY = 320;
     const imgWidth = 500;
-    const imgHeight = 280; // Ajustado para 6x2
+    const imgHeight = 280;
     const cols = 6;
     const rows = 2;
     const pieceW = imgWidth / cols;
     const pieceH = imgHeight / rows;
 
-    // Pegamos a textura para cálculos exatos de proporção
+    // Dimensões da textura original
     const puzzleTexture = this.textures.get('puzzleFull').getSourceImage();
     const tw = puzzleTexture.width;
     const th = puzzleTexture.height;
 
-    // Fundo do Puzzle (Rosa bem claro para combinar com a imagem 1)
+    // Fundo do Puzzle
     this.add.rectangle(puzzleX, puzzleY, imgWidth + 4, imgHeight + 4, 0xfff0f5, 1).setStrokeStyle(2, 0x8d6e63);
 
     this.puzzleCostText = this.add.text(600, 490, `Próxima peça: ${this.puzzleCost} pts`, {
@@ -160,43 +160,44 @@ function create() {
         backgroundColor: '#ffffffaa', padding: { x: 10, y: 5 }
     }).setOrigin(0.5).setDepth(30);
 
-    // Loop para criar as peças
+    // Loop para criar as peças via RenderTexture — sem distorção nem fendas
     for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-            // Calculamos os limites da peça na tela usando c e c+1 para evitar fendas
-            let x1 = (puzzleX - imgWidth / 2) + (c * (imgWidth / cols));
-            let x2 = (puzzleX - imgWidth / 2) + ((c + 1) * (imgWidth / cols));
-            let y1 = (puzzleY - imgHeight / 2) + (r * (imgHeight / rows));
-            let y2 = (puzzleY - imgHeight / 2) + ((r + 1) * (imgHeight / rows));
+            const cellX = (puzzleX - imgWidth / 2) + (c * pieceW);
+            const cellY = (puzzleY - imgHeight / 2) + (r * pieceH);
+            const cellW = Math.round(pieceW);
+            const cellH = Math.round(pieceH);
 
-            // Calculamos os limites correspondentes na textura original
-            let sx1 = c * (tw / cols);
-            let sx2 = (c + 1) * (tw / cols);
-            let sy1 = r * (th / rows);
-            let sy2 = (r + 1) * (th / rows);
+            // Fragmento correspondente na textura original
+            const srcX = (c / cols) * tw;
+            const srcY = (r / rows) * th;
+            const srcW = tw / cols;
+            const srcH = th / rows;
 
-            // Criamos a peça
-            let piece = this.add.sprite(x1, y1, 'puzzleFull').setOrigin(0, 0);
+            // Escala para que srcW pixels da textura caibam em cellW pixels na tela
+            const scaleX = cellW / srcW;
+            const scaleY = cellH / srcH;
 
-            // Ajustamos o tamanho de exibição para preencher exatamente o espaço entre x1 e x2
-            piece.displayWidth = x2 - x1;
-            piece.displayHeight = y2 - y1;
+            // RenderTexture com o tamanho exato da célula
+            const rt = this.add.renderTexture(cellX, cellY, cellW, cellH).setOrigin(0, 0);
 
-            // Aplicamos o crop exato
-            piece.setCrop(sx1, sy1, sx2 - sx1, sy2 - sy1);
+            // Desenha a imagem inteira deslocada e escalada de modo que
+            // apenas o fragmento correto apareça dentro do domínio do RenderTexture
+            rt.beginDraw();
+            rt.batchDraw('puzzleFull', -srcX * scaleX, -srcY * scaleY, scaleX, scaleY);
+            rt.endDraw();
 
-            piece.setInteractive();
-            piece.setTint(0xcccccc);
-            piece.setData('unlocked', false);
+            rt.setAlpha(0.3); // bloqueada = escurecida
+            rt.setData('unlocked', false);
+            rt.setInteractive(new Phaser.Geom.Rectangle(0, 0, cellW, cellH), Phaser.Geom.Rectangle.Contains);
 
-            // ... resto do evento pointerdown igual
-            piece.on('pointerdown', () => {
-                if (piece.getData('unlocked')) return;
+            rt.on('pointerdown', () => {
+                if (rt.getData('unlocked')) return;
                 if (this.kitchen.score >= this.puzzleCost) {
                     this.kitchen.score -= this.puzzleCost;
                     this.scoreText.setText(`Score: ${this.kitchen.score}`);
-                    piece.clearTint();
-                    piece.setData('unlocked', true);
+                    rt.setAlpha(1);
+                    rt.setData('unlocked', true);
                     this.puzzleCost *= 2;
                     this.puzzleCostText.setText(`Próxima peça: ${this.puzzleCost} pts`);
                     this.sound.play('collect', { volume: 0.4, detune: 500 });
@@ -204,11 +205,12 @@ function create() {
                     this.cameras.main.shake(100, 0.002);
                 }
             });
-            this.puzzlePieces.push(piece);
+
+            this.puzzlePieces.push(rt);
         }
     }
 
-    // Removidas as linhas divisórias que causavam confusão visual com o alinhamento
+    // Sem linhas divisórias — as peças encostam perfeitamente
 
     // Inicializar Cozinha
     this.kitchen = new Kitchen(this);
