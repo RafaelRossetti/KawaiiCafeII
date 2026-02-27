@@ -136,7 +136,7 @@ function create() {
     this.timerBg.setVisible(false);
 
     // SISTEMA DE PUZZLE
-    this.puzzleCost = 10;
+    this.puzzleCost = 1;
     this.puzzlePieces = [];
     const puzzleX = 600;
     const puzzleY = 320;
@@ -181,11 +181,17 @@ function create() {
             // RenderTexture com o tamanho exato da célula
             const rt = this.add.renderTexture(cellX, cellY, cellW, cellH).setOrigin(0, 0);
 
-            // Desenha a imagem inteira deslocada e escalada de modo que
-            // apenas o fragmento correto apareça dentro do domínio do RenderTexture
-            rt.beginDraw();
-            rt.batchDraw('puzzleFull', -srcX * scaleX, -srcY * scaleY, scaleX, scaleY);
-            rt.endDraw();
+            // Criamos um Image temporário e invisível com a escala certa
+            // para desenhar o fragmento correto dentro do RenderTexture
+            const tmpImg = this.add.image(0, 0, 'puzzleFull')
+                .setOrigin(0, 0)
+                .setScale(scaleX, scaleY)
+                .setVisible(false);
+
+            // rt.draw posiciona o objeto dentro do RT com offset negativo
+            // para que apenas o fragmento (col, row) apareça
+            rt.draw(tmpImg, -srcX * scaleX, -srcY * scaleY);
+            tmpImg.destroy();
 
             rt.setAlpha(0.3); // bloqueada = escurecida
             rt.setData('unlocked', false);
