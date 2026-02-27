@@ -57,6 +57,7 @@ class Kitchen {
 
     failOrder() {
         if (!this.currentOrder) return;
+        if (this.scene.isVictory) return; // Jogo já foi vencido, ignora falhas
 
         this.lives--;
         this.scene.events.emit('order-failed');

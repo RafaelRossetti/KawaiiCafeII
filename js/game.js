@@ -231,6 +231,14 @@ function create() {
 
     // Função de Vitória
     this.showVictory = () => {
+        // Para tudo imediatamente — cancela timer e bloqueia movimentos
+        this.isVictory = true;
+        if (this.kitchen && this.kitchen.orderTimer) {
+            this.kitchen.orderTimer.remove();
+            this.kitchen.orderTimer = null;
+        }
+        if (this.match3) this.match3.canMove = false;
+
         // Overlay semi-transparente
         const overlay = this.add.rectangle(900 / 2, 600 / 2, 900, 600, 0x000000, 0.65).setDepth(200);
 
@@ -259,9 +267,6 @@ function create() {
         restartBtn.on('pointerdown', () => {
             this.scene.restart();
         });
-
-        // Para o jogo
-        if (this.match3) this.match3.canMove = false;
     };
 
     // Inicializar Cozinha
