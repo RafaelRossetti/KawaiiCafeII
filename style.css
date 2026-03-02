@@ -1,8 +1,8 @@
 body {
     margin: 0;
     padding: 0;
-    background-color: #fce4ec;
-    /* Rosa bebê */
+    background-color: #E8DFBF;
+    /* Bege EXPEC Refinado */
     display: flex;
     justify-content: center;
     align-items: center;
@@ -19,8 +19,8 @@ body {
 }
 
 .kawaii-text {
-    color: #8d6e63;
-    /* Marrom café */
+    color: #8B0000;
+    /* Vermelho Escuro EXPEC */
     text-shadow: 2px 2px 0px #fff;
 }
 
@@ -30,11 +30,12 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     text-align: center;
-    pointer-events: auto; /* Alterado de none para auto para permitir cliques */
+    pointer-events: auto;
+    /* Alterado de none para auto para permitir cliques */
 }
 
 #loading-screen p {
-    color: #ad8762;
+    color: #FF6600;
     font-weight: bold;
     margin-top: 20px;
 }
@@ -49,7 +50,7 @@ body {
 }
 
 #start-btn {
-    background-color: #fc8eac;
+    background-color: #FF6600;
     color: white;
     border: none;
     padding: 15px 40px;
@@ -58,19 +59,19 @@ body {
     font-weight: bold;
     border-radius: 50px;
     cursor: pointer;
-    box-shadow: 0 6px 0 #d81b60;
+    box-shadow: 0 6px 0 #8B0000;
     transition: all 0.1s;
     display: none;
     /* Escondido até carregar */
 }
 
 #start-btn:hover {
-    background-color: #ff4081;
+    background-color: #FF8C00;
     transform: translateY(-2px);
-    box-shadow: 0 8px 0 #d81b60;
+    box-shadow: 0 8px 0 #8B0000;
 }
 
 #start-btn:active {
     transform: translateY(4px);
-    box-shadow: 0 2px 0 #d81b60;
+    box-shadow: 0 2px 0 #8B0000;
 }

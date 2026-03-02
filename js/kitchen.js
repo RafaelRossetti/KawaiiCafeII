@@ -38,10 +38,10 @@ class Kitchen {
 
     spawnOrder() {
         const recipes = [
-            { name: 'Latte de Morango', ingredients: { coffee: 1, milk: 1, strawberry: 1 } },
-            { name: 'Chá Doce', ingredients: { tea: 1, sugar: 1 } },
-            { name: 'Café com Leite', ingredients: { coffee: 1, milk: 1 } },
-            { name: 'Morango com Açúcar', ingredients: { strawberry: 2, sugar: 1 } }
+            { name: 'Fórmula Tripla Ação', ingredients: { coffee: 1, milk: 1, strawberry: 1 } },
+            { name: 'Alívio Imediato', ingredients: { tea: 1, sugar: 1 } },
+            { name: 'Dose de Cuidado', ingredients: { coffee: 1, milk: 1 } },
+            { name: 'Fórmula Concentrada', ingredients: { strawberry: 2, sugar: 1 } }
         ];
 
         this.currentOrder = Phaser.Utils.Array.GetRandom(recipes);

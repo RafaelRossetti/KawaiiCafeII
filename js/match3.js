@@ -11,11 +11,11 @@ class Match3 {
         this.canMove = true;
         this.types = ['coffee', 'milk', 'strawberry', 'tea', 'sugar'];
         this.colors = {
-            coffee: 0x6f4e37,
-            milk: 0xffffff,
-            strawberry: 0xff4081,
-            tea: 0x4caf50,
-            sugar: 0xd1c4e9 // Roxo claro (antigo 0xe0e0e0)
+            coffee: 0xFF6600, // Laranja
+            milk: 0x00BFD8,   // Azul/Ciano
+            strawberry: 0x8B0000, // Vermelho Escuro
+            tea: 0xDCCB96,    // Bege (mais amarelado/escuro)
+            sugar: 0xF5F5F5   // Branco
         };
 
         this.init();
@@ -40,10 +40,7 @@ class Match3 {
         let bg = this.scene.add.rectangle(0, 0, this.size - 4, this.size - 4, this.colors[type], 1).setInteractive();
         bg.setStrokeStyle(2, 0xffffff);
 
-        // Simbolo simples (círculo para ficar fofo) como era antes
-        let icon = this.scene.add.circle(0, 0, this.size / 4, 0x000000, 0.2);
-
-        container.add([bg, icon]);
+        container.add([bg]);
         container.setData('row', r);
         container.setData('col', c);
         container.setData('type', type);
